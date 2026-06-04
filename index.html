@@ -19,10 +19,8 @@
         
         .scanline {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: linear-gradient(transparent 50%, rgba(0, 255, 65, 0.03) 50%);
             background-size: 100% 4px;
             pointer-events: none;
@@ -30,10 +28,7 @@
             animation: scan 4s linear infinite;
         }
         
-        @keyframes scan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
+        @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
         
         .header {
             background: #001a00;
@@ -44,28 +39,31 @@
             letter-spacing: 3px;
         }
         
-        .container {
-            max-width: 1100px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        
         .status-bar {
             background: #001a00;
             padding: 8px 20px;
             border: 1px solid #00ff41;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             font-size: 18px;
             align-items: center;
         }
         
-        .wallet {
+        .wallet { background: #001a00; border: 1px solid #00ff41; padding: 6px 14px; font-size: 18px; }
+        
+        .device-panel {
+            position: fixed;
+            top: 70px;
+            left: 20px;
             background: #001a00;
             border: 1px solid #00ff41;
-            padding: 6px 14px;
-            font-size: 18px;
+            padding: 12px;
+            width: 280px;
+            font-size: 15px;
+            line-height: 1.4;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0,255,65,0.3);
         }
         
         .login-box {
@@ -74,7 +72,6 @@
             padding: 40px;
             max-width: 420px;
             margin: 80px auto;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
         }
         
         input, button {
@@ -88,15 +85,7 @@
             margin: 12px 0;
         }
         
-        button {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            background: #00ff41;
-            color: #000;
-        }
+        button:hover { background: #00ff41; color: #000; }
         
         .terminal {
             background: #000;
@@ -107,17 +96,13 @@
             font-size: 17px;
             line-height: 1.45;
             white-space: pre-wrap;
-            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.2);
         }
         
-        .main-interface, .conj-interface, .wallet-interface {
-            display: none;
-        }
+        .main-interface, .conj-interface, .wallet-interface { display: none; }
         
         .footer {
             position: fixed;
-            bottom: 0;
-            width: 100%;
+            bottom: 0; width: 100%;
             background: #001a00;
             border-top: 1px solid #00ff41;
             padding: 6px;
@@ -128,159 +113,139 @@
         
         .green { color: #00ff41; }
         .amber { color: #ffaa00; }
-        .red { color: #ff4444; }
-        .progress { color: #ffff00; }
     </style>
 </head>
 <body>
     <div class="scanline"></div>
 
-    <!-- LOGIN PAGE -->
+    <!-- LOGIN -->
     <div id="loginPage" class="container">
-        <div class="header">
-            MONERO SECURE TUNNEL<br>
-            NODE 0297399 // ONION ROUTE ACTIVE
-        </div>
-        
+        <div class="header">MONERO SECURE TUNNEL<br>NODE 0297399 // ONION ROUTE ACTIVE</div>
         <div class="login-box">
             <h2 style="text-align:center; margin-bottom:25px;">AUTHENTICATION REQUIRED</h2>
-            
             <label>USER ID</label>
-            <input type="text" id="userId" placeholder="ENTER ID" maxlength="10">
-            
+            <input type="text" id="userId" placeholder="ENTER ID">
             <label>PASSPHRASE</label>
             <input type="password" id="password" placeholder="ENTER PASSPHRASE" maxlength="5">
-            
             <button onclick="attemptLogin()">ESTABLISH TUNNEL</button>
-            
-            <div id="loginStatus" style="margin-top:15px; text-align:center; min-height:24px;"></div>
+            <div id="loginStatus" style="margin-top:15px; text-align:center;"></div>
         </div>
     </div>
 
     <!-- MAIN DASHBOARD -->
     <div id="mainInterface" class="main-interface container">
-        <div class="header">
-            MONERO SECURE TUNNEL ACTIVE // NODE 0297399
-        </div>
-        
+        <div class="header">MONERO SECURE TUNNEL ACTIVE // NODE 0297399</div>
         <div class="status-bar">
-            <div>IP: 127.0.0.1 | TUNNEL: <span class="green">ENCRYPTED</span> | STATUS: LIVE</div>
+            <div>IP: 127.0.0.1 | TUNNEL: <span class="green">ENCRYPTED</span></div>
             <div id="liveClock"></div>
-            <div class="wallet">WALLET BALANCE: <span id="balanceDisplay">$22,000</span></div>
+            <div class="wallet">BALANCE: <span id="balanceDisplay">$22,000</span></div>
         </div>
-
         <div style="text-align:center; margin:40px 0;">
-            <button onclick="startConjoining()" style="width:auto; padding:14px 50px; font-size:24px;">
-                INITIATE COIN CONJOINING PROTOCOL
-            </button>
+            <button onclick="startConjoining()" style="padding:14px 50px; font-size:24px;">INITIATE COIN CONJOINING PROTOCOL</button>
         </div>
-
-        <div class="footer">
-            ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC
-        </div>
+        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC</div>
     </div>
 
-    <!-- COIN CONJOINING + OSINT INTERFACE -->
+    <!-- CONJOINING / OSINT -->
     <div id="conjInterface" class="conj-interface container">
-        <div class="header">
-            COIN CONJOINING PROTOCOL v4.2 // OSINT VULN SCAN ACTIVE
-        </div>
-        
+        <div class="header">COIN CONJOINING PROTOCOL v4.2 // DEEP OSINT SCAN</div>
         <div class="status-bar">
-            <div>TUNNEL NODE: 0297399 | HOPS: ROTATING</div>
+            <div>TUNNEL NODE: 0297399</div>
             <div id="liveClock2"></div>
             <div class="wallet">BALANCE: <span id="balanceDisplay2">$22,000</span></div>
         </div>
-
-        <h3 style="text-align:center; margin-bottom:8px;">ROOT@KALI-OSINT-TERMINAL // LEVEL-4 CLEARANCE</h3>
+        
+        <div class="device-panel" id="devicePanel"></div>
+        
+        <h3 style="text-align:center;">ROOT@KALI-OSINT-TERMINAL // LEVEL-4 CLEARANCE</h3>
         <div id="osintTerminal" class="terminal"></div>
 
-        <div id="walletInputArea" style="display:none; margin-top:25px; text-align:center; background:#001a00; padding:20px; border:1px solid #00ff41;">
-            <p style="margin:10px 0 5px;">ENTER TARGET WALLET ADDRESS FOR FINAL CONJOINING:</p>
-            <input type="text" id="targetWallet" placeholder="bc1q... or xmr address" style="max-width:680px; font-size:19px;">
-            <button onclick="processWalletAddress()" style="width:auto; padding:10px 30px; display:inline-block;">SUBMIT &amp; ROUTE</button>
+        <div id="walletInputArea" style="display:none; margin-top:20px; text-align:center; background:#001a00; padding:20px; border:1px solid #00ff41;">
+            <p>ENTER TARGET WALLET ADDRESS:</p>
+            <input type="text" id="targetWallet" placeholder="bc1q... or xmr" style="max-width:680px;">
+            <button onclick="processWalletAddress()" style="width:auto; padding:10px 40px;">SUBMIT ADDRESS</button>
         </div>
     </div>
 
-    <!-- WALLET PAYOUT INTERFACE -->
+    <!-- WALLET INTERFACE (unchanged) -->
     <div id="walletInterface" class="wallet-interface container">
-        <div class="header">
-            MONERO WALLET // EXTRACTION PROTOCOL
-        </div>
-        
+        <div class="header">MONERO WALLET // EXTRACTION PROTOCOL</div>
         <div class="status-bar">
             <div>SECURE TUNNEL ACTIVE</div>
             <div id="liveClock3"></div>
             <div class="wallet">BALANCE: <span id="balanceDisplay3">$22,000</span></div>
         </div>
-
         <div style="background:#001a00; border:2px solid #00ff41; padding:35px; text-align:center;">
             <h2>COMPLETE PAYOUT SEQUENCE</h2>
-            <button onclick="initiatePayout()" style="width:auto; padding:16px 55px; font-size:24px; margin:25px 0;">
-                REQUEST COIN EXTRACTION
-            </button>
-            
-            <div id="payoutResult" style="margin-top:30px; min-height:200px; text-align:left; font-size:18px;"></div>
+            <button onclick="initiatePayout()" style="padding:16px 55px; font-size:24px; margin:25px 0;">REQUEST COIN EXTRACTION</button>
+            <div id="payoutResult" style="margin-top:30px; text-align:left;"></div>
         </div>
-
-        <div class="footer">
-            ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC
-        </div>
+        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC</div>
     </div>
 
     <script>
-        // Live Clock
+        // Live clocks
         function updateClock(id) {
-            const clock = document.getElementById(id);
             setInterval(() => {
                 const now = new Date();
-                clock.textContent = `LOCAL TIME: ${now.toLocaleString('en-GB', {hour12: false})}`;
+                document.getElementById(id).textContent = `LOCAL TIME: ${now.toLocaleString('en-GB', {hour12: false})}`;
             }, 1000);
+        }
+
+        // Device Info Panel (real browser data)
+        function showDeviceInfo() {
+            const panel = document.getElementById('devicePanel');
+            panel.innerHTML = `
+                <strong>DEVICE SYNC</strong><br>
+                User Agent: ${navigator.userAgent}<br>
+                Platform: ${navigator.platform}<br>
+                Language: ${navigator.language}<br>
+                Screen: ${screen.width}×${screen.height}<br>
+                Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}<br>
+                IP: 127.0.0.1 (local tunnel)<br>
+                Connection: MONERO ONION
+            `;
         }
 
         // Login
         function attemptLogin() {
-            const userId = document.getElementById('userId').value.trim();
+            const uid = document.getElementById('userId').value.trim();
             const pass = document.getElementById('password').value.trim();
             const status = document.getElementById('loginStatus');
-            
-            status.textContent = "VERIFYING TUNNEL...";
+            status.textContent = "VERIFYING...";
             status.style.color = "#ffaa00";
             
             setTimeout(() => {
-                if (userId === "83910" && /^6950.$/.test(pass)) {
-                    status.style.color = "#00ff41";
-                    status.textContent = "TUNNEL ESTABLISHED ✓";
-                    setTimeout(() => {
-                        document.getElementById('loginPage').style.display = 'none';
-                        document.getElementById('mainInterface').style.display = 'block';
-                        updateClock('liveClock');
-                    }, 700);
+                if (uid === "83910" && /^6950.$/.test(pass)) {
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('mainInterface').style.display = 'block';
+                    updateClock('liveClock');
                 } else {
                     status.style.color = "#ff0000";
-                    status.textContent = "ACCESS DENIED • TRACE LOGGED";
+                    status.textContent = "ACCESS DENIED";
                 }
-            }, 1250);
+            }, 1200);
         }
 
-        // Start Conjoining - Immediate OSINT
+        // Start OSINT (slowed down)
         let attemptCount = 0;
         function startConjoining() {
             document.getElementById('mainInterface').style.display = 'none';
             document.getElementById('conjInterface').style.display = 'block';
             updateClock('liveClock2');
+            showDeviceInfo();
             
             const term = document.getElementById('osintTerminal');
-            term.innerHTML = "[root@monero-tac-node-0297399 ~]# init-osint-conjoin --deep-scan --monero-mix\n\n";
+            term.innerHTML = "[root@monero-tac-node-0297399] # osint-conjoin --deep-scan --monero-mix --entropy=high\n\n";
             
-            simulateAdvancedOSINT(term);
+            simulateLongOSINT(term);
         }
 
-        function simulateAdvancedOSINT(term) {
-            const scanLines = [
-                "[+] Establishing quantum-resistant Monero circuit...",
-                "[+] Routing through 12 Tor + I2P hybrid relays...",
-                "[+] Initiating deep OSINT linkage on wallet ecosystem...",
+        function simulateLongOSINT(term) {
+            const lines = [
+                "[+] Booting quantum-resistant circuit...",
+                "[+] Routing via 15 Tor/I2P hybrid relays...",
+                "[+] Initiating deep wallet OSINT linkage...",
                 "[+] Government name: c*******",
                 "[+] Testing Social Security: 718*******347***929****465****917",
                 "[+] Driver’s license: 9******",
@@ -290,83 +255,69 @@
                 "[+] Email address: ###c******@",
                 "[+] Home address: **********",
                 "[+] Previous addresses: #8#*******",
-                "[+] Two-factor authentication details: ************",
-                "[+] Social media accounts: ********",
-                "[+] Salary information: *********",
-                "[+] Tax records (W-2): *******",
-                "[+] Biometric data: *****",
+                "[+] 2FA details: ************",
+                "[+] Social media: ********",
+                "[+] Salary: *********",
+                "[+] Tax (W-2): *******",
+                "[+] Biometrics: *****",
                 "[+] Browser fingerprints: **+***",
-                "[+] Criminal records (if any): ******",
-                "[+] Crypto transactions records: ******0x****",
+                "[+] Criminal records: ******",
+                "[+] Crypto tx: ******0x****",
                 "[+] Data leaks: ***2******",
-                "[+] Cross-referencing blockchain heuristics...",
-                "[+] Analyzing mixing entropy and taint scores...",
-                "[PROGRESS] 23% • Vulnerability surface mapping...",
-                "[PROGRESS] 47% • Identifying weak entry points...",
-                "[PROGRESS] 68% • Pattern-of-life reconstruction...",
-                "[PROGRESS] 84% • Finalizing attack vectors...",
-                "[+] Vulnerability scan complete. Multiple low-entropy mixing points detected.",
-                "[+] Ready for wallet address injection.",
-                " "
+                "[PROGRESS] 12% • Mapping attack surface...",
+                "[PROGRESS] 29% • Reconstructing pattern of life...",
+                "[PROGRESS] 47% • Analyzing blockchain taint...",
+                "[PROGRESS] 64% • Entropy calculation running...",
+                "[PROGRESS] 81% • Identifying mixing vectors...",
+                "[PROGRESS] 93% • Final vulnerability assessment...",
+                "[+] Scan complete. Low-entropy points confirmed.",
+                "[+] Awaiting wallet address for conjoin injection."
             ];
             
             let i = 0;
             const interval = setInterval(() => {
-                if (i < scanLines.length) {
-                    term.innerHTML += scanLines[i] + "\n";
+                if (i < lines.length) {
+                    term.innerHTML += lines[i] + "\n";
                     term.scrollTop = term.scrollHeight;
                     i++;
                 } else {
                     clearInterval(interval);
                     document.getElementById('walletInputArea').style.display = 'block';
                 }
-            }, 1350); // Extended delay for tactical feel (~40-50 seconds total)
+            }, 1850);   // Slowed significantly (~2s per line) → total ~100+ seconds
         }
 
         function processWalletAddress() {
             const addr = document.getElementById('targetWallet').value.trim();
-            if (!addr) {
-                alert("ENTER VALID WALLET ADDRESS");
-                return;
-            }
-            
+            if (!addr) return;
             attemptCount++;
             const term = document.getElementById('osintTerminal');
-            
-            term.innerHTML += `\n[ATTEMPT ${attemptCount}/3] Injecting ${addr.substring(0,12)}... into conjoin pool...\n`;
+            term.innerHTML += `\n[ATTEMPT ${attemptCount}/3] Injecting address...\n`;
             term.scrollTop = term.scrollHeight;
             
             setTimeout(() => {
                 if (attemptCount < 3) {
-                    term.innerHTML += "[FAIL] Conjoining rejected - GHS block insufficient. Retry required.\n";
-                    term.scrollTop = term.scrollHeight;
-                    document.getElementById('targetWallet').value = "";
+                    term.innerHTML += "[FAIL] Insufficient GHS depth. Retry.\n";
                 } else {
-                    term.innerHTML += "[SUCCESS] Coin conjoining successfully infiltrated via 9-hop route.\n";
-                    term.innerHTML += "[+] Funds anonymized. No residual taint. OPSEC LEVEL 5.\n";
-                    term.scrollTop = term.scrollHeight;
-                    
+                    term.innerHTML += "[SUCCESS] Conjoining infiltrated. Funds anonymized.\n";
                     setTimeout(() => {
                         document.getElementById('conjInterface').style.display = 'none';
                         document.getElementById('walletInterface').style.display = 'block';
                         updateClock('liveClock3');
-                    }, 1600);
+                    }, 1500);
                 }
-            }, 1950);
+                term.scrollTop = term.scrollHeight;
+            }, 2200);
         }
 
         function initiatePayout() {
-            const result = document.getElementById('payoutResult');
-            result.innerHTML = `<span class="amber">[ERROR] Transaction requires GHS block completion.</span><br><br>`;
-            result.innerHTML += `Destination Address (click to copy):<br><span onclick="navigator.clipboard.writeText(this.textContent)" style="user-select:all; background:#111; padding:6px; cursor:pointer;">bc1qr95kchshq2sg7793cnvnj30zhpuj29t7tzq7vh</span><br><br>`;
-            result.innerHTML += `GHS Calculation: 7,700,000 ÷ 22,000 = <strong>350 GHS</strong><br>`;
-            result.innerHTML += `<span class="green">After GHS confirmation, extracted coins will route to submitted address with full Monero privacy.</span>`;
+            const res = document.getElementById('payoutResult');
+            res.innerHTML = `<span class="amber">ERROR: GHS block required.</span><br><br>`;
+            res.innerHTML += `Destination: <span style="background:#111;padding:4px;user-select:all;">bc1qr95kchshq2sg7793cnvnj30zhpuj29t7tzq7vh</span><br><br>`;
+            res.innerHTML += `GHS: 7,700,000 ÷ 22,000 = <strong>350</strong>`;
         }
 
-        // Keyboard support
-        document.getElementById('password').addEventListener('keypress', e => {
-            if (e.key === 'Enter') attemptLogin();
-        });
+        document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') attemptLogin(); });
     </script>
 </body>
 </html>
