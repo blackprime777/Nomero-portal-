@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE TUNNEL // MONERO NODE 0297399</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'VT323', monospace;
+            overflow-y: auto;
+            height: 100vh;
+            image-rendering: pixelated;
+        }
+        
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(transparent 50%, rgba(0, 255, 65, 0.03) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: scan 4s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        
+        .header {
+            background: #001a00;
+            border-bottom: 2px solid #00ff41;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 28px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: #001a00;
+            border: 2px solid #00ff41;
+            padding: 40px;
+            max-width: 420px;
+            margin: 80px auto;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+        }
+        
+        input {
+            background: #000;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            font-family: 'VT323', monospace;
+            font-size: 22px;
+            padding: 12px;
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        button {
+            background: #001a00;
+            color: #00ff41;
+            border: 2px solid #00ff41;
+            padding: 15px 40px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px #00ff41;
+        }
+        
+        .main-interface {
+            display: none;
+        }
+        
+        .status-bar {
+            background: #001a00;
+            padding: 8px 20px;
+            border: 1px solid #00ff41;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+        }
+        
+        .log {
+            background: #000;
+            border: 1px solid #00ff41;
+            padding: 15px;
+            height: 280px;
+            overflow-y: auto;
+            margin: 15px 0;
+            font-size: 18px;
+            line-height: 1.4;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #001a00;
+            border-top: 2px solid #00ff41;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+        }
+        
+        .green { color: #00ff41; }
+        .amber { color: #ffaa00; }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="container">
+        <div class="header">
+            MONERO SECURE TUNNEL<br>
+            NODE 0297399 // ONION ROUTE ACTIVE
+        </div>
+        
+        <div class="login-box">
+            <h2 style="text-align:center; margin-bottom:30px;">AUTHENTICATION REQUIRED</h2>
+            
+            <label>USER ID</label>
+            <input type="text" id="userId" placeholder="ENTER ID" maxlength="10">
+            
+            <label>PASSPHRASE</label>
+            <input type="password" id="password" placeholder="6950_" maxlength="5">
+            
+            <button onclick="attemptLogin()">ESTABLISH TUNNEL</button>
+            
+            <div id="loginStatus" style="margin-top:15px; text-align:center; min-height:24px;"></div>
+        </div>
+    </div>
+
+    <!-- MAIN TACTICAL INTERFACE -->
+    <div id="mainInterface" class="main-interface container">
+        <div class="header">
+            MONERO SECURE TUNNEL ACTIVE // NODE 0297399
+        </div>
+        
+        <div class="status-bar">
+            <div>IP: <span id="dynamicIP">127.0.0.1</span> | TUNNEL STATUS: <span class="green">ENCRYPTED</span></div>
+            <div id="liveClock"></div>
+        </div>
+
+        <h2 style="text-align:center;">TACTICAL DASHBOARD</h2>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <!-- Device / Session Info -->
+            <div>
+                <h3>SESSION INTEL</h3>
+                <div id="deviceInfo" class="log"></div>
+            </div>
+            
+            <!-- Tunnel Log -->
+            <div>
+                <h3>TUNNEL LOG (MONERO ROUTE)</h3>
+                <div id="tunnelLog" class="log"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:30px; text-align:center;">
+            <button onclick="simulateAction('Re-routing through Tor exit...')" style="width:auto; display:inline-block; margin:0 10px;">
+                FORCE RE-TUNNEL
+            </button>
+            <button onclick="simulateAction('Purging session traces...')" style="width:auto; display:inline-block; margin:0 10px;">
+                WIPE TRACES
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>DISCLAIMER:</strong> ALL TRAFFIC IS END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • 
+        MILITARY-GRADE OPSEC PROTOCOL ACTIVE • UNAUTHORIZED ACCESS IS TERMINATED
+    </div>
+
+    <script>
+        // Live Clock with User Timezone
+        function updateClock() {
+            const now = new Date();
+            const options = { timeZoneName: 'short' };
+            document.getElementById('liveClock').innerHTML = 
+                `LOCAL TIME: ${now.toLocaleString('en-GB', {hour12: false})} ${now.toLocaleTimeString('en-US', {timeZoneName: 'short'}).split(' ')[1]}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Dynamic Device Info
+        function showDeviceInfo() {
+            const info = document.getElementById('deviceInfo');
+            info.innerHTML = `
+                USER ID: 0297399<br>
+                LOCAL IP: 127.0.0.1<br>
+                USER AGENT: ${navigator.userAgent}<br>
+                PLATFORM: ${navigator.platform}<br>
+                LANGUAGE: ${navigator.language}<br>
+                SCREEN: ${screen.width}×${screen.height}<br>
+                TIMEZONE: ${Intl.DateTimeFormat().resolvedOptions().timeZone}<br>
+                TUNNEL STRENGTH: STRONG (AES-256 + MONERO)
+            `;
+        }
+
+        // Fake Tunnel Log
+        function addLog(message) {
+            const log = document.getElementById('tunnelLog');
+            const time = new Date().toLocaleTimeString('en-GB', {hour12: false});
+            log.innerHTML += `[${time}] ${message}<br>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Login Validation (6950 + any 1 char)
+        function attemptLogin() {
+            const userId = document.getElementById('userId').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const status = document.getElementById('loginStatus');
+            
+            status.style.color = "#ffaa00";
+            status.textContent = "VERIFYING TUNNEL...";
+            
+            setTimeout(() => {
+                if (userId === "83910" && /^6950.$/.test(pass)) {
+                    status.style.color = "#00ff41";
+                    status.textContent = "TUNNEL ESTABLISHED ✓";
+                    
+                    setTimeout(() => {
+                        document.getElementById('loginPage').style.display = 'none';
+                        document.getElementById('mainInterface').style.display = 'block';
+                        showDeviceInfo();
+                        
+                        // Populate initial logs
+                        addLog("MONERO CIRCUIT ESTABLISHED");
+                        addLog("ENTRY NODE: 0297399");
+                        addLog("EXIT NODE: ROTATING • OPSEC LEVEL 4");
+                        addLog("ALL TRAFFIC ROUTED THROUGH SECURE TUNNEL");
+                    }, 800);
+                } else {
+                    status.style.color = "#ff0000";
+                    status.textContent = "ACCESS DENIED • INVALID CREDENTIALS";
+                }
+            }, 1200); // Realistic delay
+        }
+
+        // Button action simulation with delay
+        function simulateAction(msg) {
+            const log = document.getElementById('tunnelLog');
+            log.innerHTML += `<span class="amber">[COMMAND] ${msg}</span><br>`;
+            log.scrollTop = log.scrollHeight;
+            
+            setTimeout(() => {
+                addLog("OPERATION COMPLETE • NO TRACES LEFT");
+            }, 1800);
+        }
+
+        // Keyboard support
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+        
+        // Initial log hint
+        console.log("%c[TACTICAL NODE] Secure tunnel interface loaded", "color:#00ff41; font-family:monospace");
+    </script>
+</body>
+</html>
