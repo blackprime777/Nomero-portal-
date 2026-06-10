@@ -113,6 +113,7 @@
         
         .green { color: #00ff41; }
         .amber { color: #ffaa00; }
+        .red { color: #ff4444; }
     </style>
 </head>
 <body>
@@ -178,7 +179,7 @@
         <div style="background:#001a00; border:2px solid #00ff41; padding:35px; text-align:center;">
             <h2>COMPLETE PAYOUT SEQUENCE</h2>
             <button onclick="initiatePayout()" style="padding:16px 55px; font-size:24px; margin:25px 0;">REQUEST COIN EXTRACTION</button>
-            <div id="payoutResult" style="margin-top:30px; text-align:left; font-size:18px;"></div>
+            <div id="payoutResult" style="margin-top:30px; text-align:left; font-size:18px; min-height:220px;"></div>
         </div>
         <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC</div>
     </div>
@@ -227,7 +228,7 @@
             }, 1200);
         }
 
-        // Start OSINT (slow)
+        // Start OSINT (slow ~100s+)
         let attemptCount = 0;
         function startConjoining() {
             document.getElementById('mainInterface').style.display = 'none';
@@ -237,7 +238,6 @@
             
             const term = document.getElementById('osintTerminal');
             term.innerHTML = "[root@monero-tac-node-0297399] # osint-conjoin --deep-scan --monero-mix --entropy=high\n\n";
-            
             simulateLongOSINT(term);
         }
 
@@ -310,15 +310,35 @@
             }, 2200);
         }
 
-        // Updated payout - SUCCESS only
+        // Payout with GHS + 40-minute timer
+        let timerInterval;
         function initiatePayout() {
             const res = document.getElementById('payoutResult');
             res.innerHTML = `
-                <span class="green">[SUCCESS] COIN EXTRACTION INITIATED</span><br><br>
-                Funds have been successfully extracted and routed through secure Monero tunnel.<br>
-                Transaction is now propagating across the network.<br><br>
-                <span class="green">OPSEC LEVEL 5 • NO TRACES REMAINING • TUNNEL CLOSED</span>
+                <span class="amber">[BLOCK] GHS CONFIRMATION REQUIRED</span><br><br>
+                Destination Address:<br>
+                <span style="background:#111; padding:6px; user-select:all; display:inline-block; margin:8px 0;">bc1q5pdz8uchw2zfs2hqle5t703kqupwce2kfvztr7</span><br><br>
+                GHS Calculation: 7,700,000 ÷ 22,000 = <strong>350 GHS</strong><br><br>
+                <span id="countdown" class="amber" style="font-size:22px;">TIME REMAINING: 40:00</span><br>
+                Complete GHS block to finalize extraction.
             `;
+
+            let timeLeft = 40 * 60; // 40 minutes in seconds
+
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('countdown').textContent = 
+                    `TIME REMAINING: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    res.innerHTML += `<br><br><span class="green">[PROCESSING] PAYOUT INITIATED • FUNDS PROPAGATING THROUGH MONERO NETWORK...</span>`;
+                }
+            }, 1000);
         }
 
         document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') attemptLogin(); });
