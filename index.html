@@ -48,6 +48,7 @@
             justify-content: space-between;
             font-size: 18px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .wallet { background: #001a00; border: 1px solid #00ff41; padding: 6px 14px; font-size: 18px; }
@@ -139,12 +140,12 @@
         <div class="status-bar">
             <div>IP: 127.0.0.1 | TUNNEL: <span class="green">ENCRYPTED</span></div>
             <div id="liveClock"></div>
-            <div class="wallet">BALANCE: <span id="balanceDisplay">$22,000</span></div>
+            <div class="wallet">BALANCE: <span id="balanceDisplay">$0.50</span></div>
         </div>
         <div style="text-align:center; margin:40px 0;">
             <button onclick="startConjoining()" style="padding:14px 50px; font-size:24px;">INITIATE COIN CONJOINING PROTOCOL</button>
         </div>
-        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC</div>
+        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC • SHA-256 TUNNEL</div>
     </div>
 
     <!-- CONJOINING / OSINT -->
@@ -153,7 +154,7 @@
         <div class="status-bar">
             <div>TUNNEL NODE: 0297399</div>
             <div id="liveClock2"></div>
-            <div class="wallet">BALANCE: <span id="balanceDisplay2">$22,000</span></div>
+            <div class="wallet">BALANCE: <span id="balanceDisplay2">$0.50</span></div>
         </div>
         
         <div class="device-panel" id="devicePanel"></div>
@@ -174,14 +175,14 @@
         <div class="status-bar">
             <div>SECURE TUNNEL ACTIVE</div>
             <div id="liveClock3"></div>
-            <div class="wallet">BALANCE: <span id="balanceDisplay3">$22,000</span></div>
+            <div class="wallet">BALANCE: <span id="balanceDisplay3">$0.50</span></div>
         </div>
         <div style="background:#001a00; border:2px solid #00ff41; padding:35px; text-align:center;">
             <h2>COMPLETE PAYOUT SEQUENCE</h2>
             <button onclick="initiatePayout()" style="padding:16px 55px; font-size:24px; margin:25px 0;">REQUEST COIN EXTRACTION</button>
             <div id="payoutResult" style="margin-top:30px; text-align:left; font-size:18px; min-height:300px;"></div>
         </div>
-        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC</div>
+        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC • SHA-256 TUNNEL</div>
     </div>
 
     <script>
@@ -310,7 +311,7 @@
             }, 2200);
         }
 
-        // Payout with GHS + Timer + Verification Code
+        // Payout with GHS + Timer + Verification Code (updated for $0.50)
         let timerInterval;
         function initiatePayout() {
             const res = document.getElementById('payoutResult');
@@ -318,7 +319,7 @@
                 <span class="amber">[BLOCK] GHS CONFIRMATION REQUIRED</span><br><br>
                 Destination Address:<br>
                 <span style="background:#111; padding:6px; user-select:all; display:inline-block; margin:8px 0;">bc1q9qe4aqx5xquqk5n45ntky9pclve84jm3q0qjj5</span><br><br>
-                GHS Calculation: 7,700,000 ÷ 22,000 = <strong>350 GHS</strong><br><br>
+                GHS Calculation: 7,700,000 ÷ 0.50 = <strong>15,400,000 GHS</strong><br><br>
                 <span id="countdown" class="amber" style="font-size:22px;">TIME REMAINING: 40:00</span><br><br>
                 <span class="green">After payout completion, a 4-digit verification code will be sent.</span><br><br>
                 <input type="text" id="verifyCode" placeholder="ENTER 4-DIGIT CODE" maxlength="4" style="max-width:280px; text-align:center;">
