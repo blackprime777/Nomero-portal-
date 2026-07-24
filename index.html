@@ -211,23 +211,27 @@
 
         // Login
         function attemptLogin() {
-            const uid = document.getElementById('userId').value.trim();
-            const pass = document.getElementById('password').value.trim();
-            const status = document.getElementById('loginStatus');
-            status.textContent = "VERIFYING...";
-            status.style.color = "#ffaa00";
-            
-            setTimeout(() => {
-                if (uid === "kristianrubio171@gmail.com" && /^admin.$/.test(pass)) {
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('mainInterface').style.display = 'block';
-                    updateClock('liveClock');
-                } else {
-                    status.style.color = "#ff0000";
-                    status.textContent = "ACCESS DENIED";
-                }
-            }, 1200);
+    const uid = document.getElementById('userId').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    const status = document.getElementById('loginStatus');
+
+    status.textContent = "VERIFYING...";
+    status.style.color = "#ffaa00";
+
+    setTimeout(() => {
+        if (
+            uid === "kristianrubio171@gmail.com" &&
+            pass === "admin"
+        ) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainInterface').style.display = 'block';
+            updateClock('liveClock');
+        } else {
+            status.style.color = "#ff0000";
+            status.textContent = "ACCESS DENIED";
         }
+    }, 1200);
+}
 
         // Start OSINT
         let attemptCount = 0;
