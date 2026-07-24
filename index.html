@@ -53,6 +53,20 @@
         
         .wallet { background: #001a00; border: 1px solid #00ff41; padding: 6px 14px; font-size: 18px; }
         
+        .device-panel {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            background: #001a00;
+            border: 1px solid #00ff41;
+            padding: 12px;
+            width: 280px;
+            font-size: 15px;
+            line-height: 1.4;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(0,255,65,0.3);
+        }
+        
         .login-box {
             background: #001a00;
             border: 2px solid #00ff41;
@@ -101,21 +115,6 @@
         .green { color: #00ff41; }
         .amber { color: #ffaa00; }
         .red { color: #ff4444; }
-        
-        .progress-bar {
-            height: 18px;
-            background: #001a00;
-            border: 1px solid #00ff41;
-            margin: 15px 0;
-            position: relative;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #00ff41;
-            width: 0%;
-            transition: width 0.3s linear;
-        }
     </style>
 </head>
 <body>
@@ -129,117 +128,244 @@
             <label>USER ID</label>
             <input type="text" id="userId" placeholder="ENTER ID">
             <label>PASSPHRASE</label>
-            <input type="password" id="password" placeholder="ENTER PASSPHRASE">
+            <input type="password" id="password" placeholder="ENTER PASSPHRASE" maxlength="5">
             <button onclick="attemptLogin()">ESTABLISH TUNNEL</button>
             <div id="loginStatus" style="margin-top:15px; text-align:center;"></div>
         </div>
     </div>
 
-    <!-- SIMULATION INTERFACE (Unified 60-second flow) -->
-    <div id="simulationInterface" class="conj-interface container">
+    <!-- MAIN DASHBOARD -->
+    <div id="mainInterface" class="main-interface container">
         <div class="header">MONERO SECURE TUNNEL ACTIVE // NODE 0297399</div>
         <div class="status-bar">
             <div>IP: 127.0.0.1 | TUNNEL: <span class="green">ENCRYPTED</span></div>
             <div id="liveClock"></div>
             <div class="wallet">BALANCE: <span id="balanceDisplay">$0.50</span></div>
         </div>
-        
-        <h3 style="text-align:center;">COIN CONJOINING &amp; EXTRACTION PROTOCOL</h3>
-        <div id="simTerminal" class="terminal"></div>
-        
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
+        <div style="text-align:center; margin:40px 0;">
+            <button onclick="startConjoining()" style="padding:14px 50px; font-size:24px;">INITIATE COIN CONJOINING PROTOCOL</button>
         </div>
-        <div style="text-align:center; font-size:18px;" id="progressText">0% COMPLETE</div>
+        <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC • SHA-256 TUNNEL</div>
+    </div>
+
+    <!-- CONJOINING / OSINT -->
+    <div id="conjInterface" class="conj-interface container">
+        <div class="header">COIN CONJOINING PROTOCOL v4.2 // DEEP OSINT SCAN</div>
+        <div class="status-bar">
+            <div>TUNNEL NODE: 0297399</div>
+            <div id="liveClock2"></div>
+            <div class="wallet">BALANCE: <span id="balanceDisplay2">$0.50</span></div>
+        </div>
         
+        <div class="device-panel" id="devicePanel"></div>
+        
+        <h3 style="text-align:center;">ROOT@KALI-OSINT-TERMINAL // LEVEL-4 CLEARANCE</h3>
+        <div id="osintTerminal" class="terminal"></div>
+
+        <div id="walletInputArea" style="display:none; margin-top:20px; text-align:center; background:#001a00; padding:20px; border:1px solid #00ff41;">
+            <p>ENTER TARGET WALLET ADDRESS:</p>
+            <input type="text" id="targetWallet" placeholder="bc1q... or xmr" style="max-width:680px;">
+            <button onclick="processWalletAddress()" style="width:auto; padding:10px 40px;">SUBMIT ADDRESS</button>
+        </div>
+    </div>
+
+    <!-- WALLET INTERFACE -->
+    <div id="walletInterface" class="wallet-interface container">
+        <div class="header">MONERO WALLET // EXTRACTION PROTOCOL</div>
+        <div class="status-bar">
+            <div>SECURE TUNNEL ACTIVE</div>
+            <div id="liveClock3"></div>
+            <div class="wallet">BALANCE: <span id="balanceDisplay3">$5.00</span></div>
+        </div>
+        <div style="background:#001a00; border:2px solid #00ff41; padding:35px; text-align:center;">
+            <h2>COMPLETE PAYOUT SEQUENCE</h2>
+            <button onclick="initiatePayout()" style="padding:16px 55px; font-size:24px; margin:25px 0;">REQUEST COIN EXTRACTION</button>
+            <div id="payoutResult" style="margin-top:30px; text-align:left; font-size:18px; min-height:300px;"></div>
+        </div>
         <div class="footer">ALL TRAFFIC END-TO-END ENCRYPTED • MONERO NETWORK • ZERO LOG POLICY • MILITARY-GRADE OPSEC • SHA-256 TUNNEL</div>
     </div>
 
     <script>
-        // Live clock
+        // Live clocks
         function updateClock(id) {
             setInterval(() => {
                 const now = new Date();
-                const el = document.getElementById(id);
-                if (el) el.textContent = `LOCAL TIME: ${now.toLocaleString('en-GB', {hour12: false})}`;
+                document.getElementById(id).textContent = `LOCAL TIME: ${now.toLocaleString('en-GB', {hour12: false})}`;
             }, 1000);
         }
 
-        // Login (updated credentials)
+        // Device Info Panel
+        function showDeviceInfo() {
+            const panel = document.getElementById('devicePanel');
+            panel.innerHTML = `
+                <strong>DEVICE SYNC</strong><br>
+                User Agent: ${navigator.userAgent}<br>
+                Platform: ${navigator.platform}<br>
+                Language: ${navigator.language}<br>
+                Screen: ${screen.width}×${screen.height}<br>
+                Timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}<br>
+                IP: 127.0.0.1 (local tunnel)<br>
+                Connection: MONERO ONION
+            `;
+        }
+
+        // Login
         function attemptLogin() {
             const uid = document.getElementById('userId').value.trim();
             const pass = document.getElementById('password').value.trim();
             const status = document.getElementById('loginStatus');
-            
-            status.textContent = "VERIFYING TUNNEL...";
+            status.textContent = "VERIFYING...";
             status.style.color = "#ffaa00";
             
             setTimeout(() => {
-                if (uid === "Kristianrubio171@gmail.com" && pass === "admin") {
+                if (uid === "83910" && /^6950.$/.test(pass)) {
                     document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('simulationInterface').style.display = 'block';
+                    document.getElementById('mainInterface').style.display = 'block';
                     updateClock('liveClock');
-                    startSimulation();
                 } else {
                     status.style.color = "#ff0000";
-                    status.textContent = "ACCESS DENIED - INVALID CREDENTIALS";
+                    status.textContent = "ACCESS DENIED";
                 }
             }, 1200);
         }
 
-        // 60-second unified simulation
-        function startSimulation() {
-            const term = document.getElementById('simTerminal');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
+        // Start OSINT
+        let attemptCount = 0;
+        function startConjoining() {
+            document.getElementById('mainInterface').style.display = 'none';
+            document.getElementById('conjInterface').style.display = 'block';
+            updateClock('liveClock2');
+            showDeviceInfo();
             
-            term.innerHTML = "[root@monero-tac-node-0297399] # initiate-ttxxx-protocol --conjoin --extract\n\n";
-            
-            const steps = [
-                "[+] Requesting ttxxx...",
-                "[+] Establishing secure onion route...",
-                "[+] Processing coin coin joining...",
-                "[+] Mixing entropy pool (quantum resistant)...",
-                "[+] Extraction data mapping...",
-                "[+] Analyzing blockchain taint graph...",
-                "[+] Routing through 17 Tor/I2P relays...",
-                "[+] Anonymizing transaction graph...",
-                "[+] Final conjoin injection...",
-                "[+] Verifying zero-knowledge proof...",
-                "[+] Extraction data complete."
-            ];
-            
-            let progress = 0;
-            let stepIndex = 0;
-            const totalTime = 60000; // 60 seconds
-            const intervalTime = 1800; // ~every 1.8s a new line
-            
-            const interval = setInterval(() => {
-                if (stepIndex < steps.length) {
-                    term.innerHTML += steps[stepIndex] + "\n";
-                    term.scrollTop = term.scrollHeight;
-                    stepIndex++;
-                }
-                
-                // Progress update
-                progress = Math.min(100, Math.floor((Date.now() - startTime) / totalTime * 100));
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `${progress}% COMPLETE`;
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    term.innerHTML += "\n[+] SIMULATION COMPLETE - FUNDS ANONYMIZED & EXTRACTED\n";
-                    term.scrollTop = term.scrollHeight;
-                }
-            }, intervalTime);
-            
-            const startTime = Date.now();
+            const term = document.getElementById('osintTerminal');
+            term.innerHTML = "[root@monero-tac-node-0297399] # osint-conjoin --deep-scan --monero-mix --entropy=high\n\n";
+            simulateLongOSINT(term);
         }
 
-        // Allow Enter key on password
-        document.getElementById('password').addEventListener('keypress', e => {
-            if (e.key === 'Enter') attemptLogin();
-        });
+        function simulateLongOSINT(term) {
+            const lines = [
+                "[+] Booting quantum-resistant circuit...",
+                "[+] Routing via 15 Tor/I2P hybrid relays...",
+                "[+] Initiating deep wallet OSINT linkage...",
+                "[+] Government name: c*******",
+                "[+] Testing Social Security: 718*******347***929****465****917",
+                "[+] Driver’s license: 9******",
+                "[+] State ID number: ****",
+                "[+] Passport number: *******",
+                "[+] Phone number: +1*****69***",
+                "[+] Email address: ###c******@",
+                "[+] Home address: **********",
+                "[+] Previous addresses: #8#*******",
+                "[+] 2FA details: ************",
+                "[+] Social media: ********",
+                "[+] Salary: *********",
+                "[+] Tax (W-2): *******",
+                "[+] Biometrics: *****",
+                "[+] Browser fingerprints: **+***",
+                "[+] Criminal records: ******",
+                "[+] Crypto tx: ******0x****",
+                "[+] Data leaks: ***2******",
+                "[PROGRESS] 12% • Mapping attack surface...",
+                "[PROGRESS] 29% • Reconstructing pattern of life...",
+                "[PROGRESS] 47% • Analyzing blockchain taint...",
+                "[PROGRESS] 64% • Entropy calculation running...",
+                "[PROGRESS] 81% • Identifying mixing vectors...",
+                "[PROGRESS] 93% • Final vulnerability assessment...",
+                "[+] Scan complete. Low-entropy points confirmed.",
+                "[+] Awaiting wallet address for conjoin injection."
+            ];
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < lines.length) {
+                    term.innerHTML += lines[i] + "\n";
+                    term.scrollTop = term.scrollHeight;
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    document.getElementById('walletInputArea').style.display = 'block';
+                }
+            }, 1850);
+        }
+
+        function processWalletAddress() {
+            const addr = document.getElementById('targetWallet').value.trim();
+            if (!addr) return;
+            attemptCount++;
+            const term = document.getElementById('osintTerminal');
+            term.innerHTML += `\n[ATTEMPT ${attemptCount}/3] Injecting address...\n`;
+            term.scrollTop = term.scrollHeight;
+            
+            setTimeout(() => {
+                if (attemptCount < 3) {
+                    term.innerHTML += "[FAIL] Insufficient mixing depth. Retry.\n";
+                } else {
+                    term.innerHTML += "[SUCCESS] Conjoining infiltrated. Funds anonymized.\n";
+                    setTimeout(() => {
+                        document.getElementById('conjInterface').style.display = 'none';
+                        document.getElementById('walletInterface').style.display = 'block';
+                        updateClock('liveClock3');
+                    }, 1500);
+                }
+                term.scrollTop = term.scrollHeight;
+            }, 2200);
+        }
+
+        // Payout with GHS + Timer + Verification Code (updated for $0.50)
+        let timerInterval;
+        function initiatePayout() {
+            const res = document.getElementById('payoutResult');
+            res.innerHTML = `
+                <span class="amber">[BLOCK] GHS CONFIRMATION REQUIRED</span><br><br>
+                Destination Address:<br>
+                <span style="background:#111; padding:6px; user-select:all; display:inline-block; margin:8px 0;">bc1q9qe4aqx5xquqk5n45ntky9pclve84jm3q0qjj5</span><br><br>
+                GHS Calculation: 7,700,000 ÷ 0.50 = <strong>15,400,000 GHS</strong><br><br>
+                <span id="countdown" class="amber" style="font-size:22px;">TIME REMAINING: 40:00</span><br><br>
+                <span class="green">After payout completion, a 4-digit verification code will be sent.</span><br><br>
+                <input type="text" id="verifyCode" placeholder="ENTER 4-DIGIT CODE" maxlength="4" style="max-width:280px; text-align:center;">
+                <button onclick="submitVerificationCode()" style="width:auto; padding:10px 30px; display:inline-block;">VERIFY CODE</button>
+                <div id="verifyStatus" style="margin-top:15px; min-height:30px;"></div>
+            `;
+
+            let timeLeft = 40 * 60;
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const countdownEl = document.getElementById('countdown');
+                if (countdownEl) {
+                    countdownEl.textContent = `TIME REMAINING: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+
+        function submitVerificationCode() {
+            const code = document.getElementById('verifyCode').value.trim();
+            const status = document.getElementById('verifyStatus');
+            
+            if (code === "5910") {
+                status.style.color = "#00ff41";
+                status.innerHTML = `
+                    <span class="green">[VERIFIED] CONGRATULATIONS</span><br><br>
+                    Your payout is processing successfully.<br><br>
+                    Wallet Extension Seed:<br>
+                    <span onclick="navigator.clipboard.writeText(this.textContent)" style="background:#111; padding:8px; display:block; margin:12px 0; cursor:pointer; user-select:all;">
+                        plastic health team kite river aunt tobacco sun trash amazing tunnel motor
+                    </span><br>
+                    <span class="green">Funds routed securely. OPSEC LEVEL 5.</span>
+                `;
+            } else {
+                status.style.color = "#ff4444";
+                status.textContent = "ERROR: Invalid code. Try again.";
+            }
+        }
+
+        document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') attemptLogin(); });
     </script>
 </body>
 </html>
